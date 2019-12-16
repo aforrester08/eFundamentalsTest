@@ -1,12 +1,60 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import ReactWordcloud from 'react-wordcloud';
+import TableComponent from './components/TableComponent.js';
 import * as serviceWorker from './serviceWorker';
+import CloudOptions from './CloudOptions.js'
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      manualArray: [{text: "Great", value: 60}, {text: "bad", value: 10}, {text: "excellent", value: 60}],
+      reviewsArray: [],
+      counts: {}
+    };
+    this.handleReviewData = this.handleReviewData.bind(this);
+  }
+
+  componentDidMount() {
+    const url = "https://raw.githubusercontent.com/Jordanddick/ef-coding-challenge-2/master/reviews.json"
+
+    fetch(url)
+    .then(res => res.json())
+    .then(resultArray => this.setState({
+      reviewsArray: resultArray.reviews.join("\n").toLowerCase().split(/\W+/)
+    }))
+    .catch(err => console.error)
+    .finally(this.handleReviewData);
+  }
+
+  handleReviewData() {
+    let newState = Object.assign({}, this.state);
+
+    for (let i = 0; i < newState.reviewsArray.length; i++) {
+      let word = newState.reviewsArray[i];
+      if (!newState.counts.hasOwnProperty(word)) {
+        newState.counts[word] = 1;
+      } else {
+        newState.counts[word] += 1;
+      }
+    }
+
+    this.setState(newState);
+  }
+
+  render() {
+    return(
+      <div className="main" style={{ height: 600, width: 600 }}>
+        <ReactWordcloud options={CloudOptions} words={this.state.manualArray}/>
+        <TableComponent counts={this.state.counts} />
+      </div>
+    )
+  }
+
+}
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+
 serviceWorker.unregister();
