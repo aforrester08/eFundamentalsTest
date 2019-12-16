@@ -9,7 +9,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      manualArray: [{text: "Great", value: 60}, {text: "bad", value: 10}, {text: "excellent", value: 60}],
+      finalArray: [],
       reviewsArray: [],
       counts: {}
     };
@@ -41,12 +41,19 @@ class App extends Component {
     }
 
     this.setState(newState);
+
+    const dataFinal = Object.keys(this.state.counts).map(key => {
+      return {text: key, value: newState.counts[key]}
+    });
+
+    this.setState({finalArray: dataFinal})
+
   }
 
   render() {
     return(
       <div className="main" style={{ height: 600, width: 600 }}>
-        <ReactWordcloud options={CloudOptions} words={this.state.manualArray}/>
+        <ReactWordcloud options={CloudOptions} words={this.state.finalArray}/>
         <TableComponent counts={this.state.counts} />
       </div>
     )
